@@ -761,10 +761,6 @@
       cursor: pointer;
       z-index: 1001;
       box-shadow: 0 0 15px rgba(123, 44, 191, 0.7);
-     
-      transform: none !important;
-      animation: none !important;
-      transition: none !important;
     }
     
     .mobile-controls-toggle span {
@@ -788,67 +784,6 @@
     
     .mobile-controls-toggle.active span:nth-child(3) {
       transform: translateY(-6px) rotate(-45deg);
-    }
-    
-    /* Responsive design */
-    @media (max-width: 768px) {
-      .mobile-controls-toggle {
-        display: flex;
-      }
-      
-      .controls-panel {
-        width: calc(100% - 30px);
-        right: 15px;
-        top: 70px;
-        transform: translateX(150%);
-        max-height: calc(100vh - 90px);
-      }
-      
-      .controls-panel.active {
-        transform: translateX(0);
-      }
-      
-      .container {
-        animation: none !important;
-      }
-    }
-    
-    /* Toggle between login/register */
-    .form-toggle {
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 0.95rem;
-      position: relative;
-    }
-    
-    .form-toggle a {
-      color: var(--secondary);
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      position: relative;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-    }
-    
-    .form-toggle a::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 20px;
-      background: rgba(157, 78, 221, 0.1);
-      transform: scale(0.8);
-      opacity: 0;
-      transition: all 0.3s ease;
-      z-index: -1;
-    }
-    
-    .form-toggle a:hover::before {
-      transform: scale(1);
-      opacity: 1;
     }
     
     /* Particle effects */
@@ -909,7 +844,6 @@
       animation: comet-fly 20s linear infinite;
       z-index: -1;
       opacity: 0;
-      display: var(--comet-effect);
     }
     
     .comet::before {
@@ -1003,6 +937,111 @@
     .save-btn:hover {
       background: rgba(157, 78, 221, 0.4);
     }
+
+    /* Responsive design - Mobile specific overrides */
+    @media (max-width: 768px) {
+      .mobile-controls-toggle {
+        display: flex;
+      }
+      
+      .controls-panel {
+        width: calc(100% - 30px);
+        right: 15px;
+        top: 70px;
+        transform: translateX(150%);
+        max-height: calc(100vh - 90px);
+        overflow-y: auto;
+      }
+      
+      .controls-panel.active {
+        transform: translateX(0);
+      }
+      
+      .container {
+        margin: 20px auto;
+        padding: 1.5rem;
+        max-width: 90%;
+        animation: none !important;
+      }
+      
+      h2 {
+        font-size: 1.8rem;
+      }
+      
+      /* Disable heavy animations on mobile only */
+      .container::before, .container::after {
+        animation: none !important;
+      }
+      
+      .star {
+        animation: none !important;
+      }
+      
+      .shooting-star {
+        animation: none !important;
+        display: none !important;
+      }
+      
+      .nebula {
+        animation: none !important;
+      }
+      
+      .comet {
+        animation: none !important;
+        display: none !important;
+      }
+      
+      .pulse-orb {
+        animation: none !important;
+        display: none !important;
+      }
+      
+      .aurora {
+        animation: none !important;
+      }
+      
+      .constellation, .constellation-line {
+        animation: none !important;
+      }
+      
+      /* Simplify form animations on mobile */
+      .form-group {
+        animation: none !important;
+        opacity: 1;
+      }
+      
+      .form-group::before, .form-group.active::before {
+        display: none;
+      }
+      
+      .btn:hover, .btn:active {
+        transform: none;
+        box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+      }
+      
+      h2::after {
+        animation: none !important;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .form-group {
+        margin-bottom: 1.2rem;
+      }
+      
+      .input-field input, .input-field select {
+        padding: 12px 15px;
+      }
+      
+      .btn {
+        padding: 14px;
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1037,7 +1076,7 @@
   <div class="pulse-orb" style="top: 70%; left: 80%; animation-delay: 2s;"></div>
   <div class="pulse-orb" style="top: 40%; left: 60%; animation-delay: 4s;"></div>
   
-  <!-- Mobile Controls Toggle - Now Fixed Position -->
+  <!-- Mobile Controls Toggle -->
   <div class="mobile-controls-toggle" id="mobileControlsToggle">
     <span></span>
     <span></span>
@@ -1328,7 +1367,7 @@
       });
       
       updateCSSVariables();
-      createOptimizedStars();
+      createStars();
       createShootingStars();
       createConstellation();
       updateComet();
@@ -1357,8 +1396,8 @@
       document.documentElement.style.setProperty('--accent', theme.accent);
     }
 
-    // Optimized Starfield Creation
-    function createOptimizedStars() {
+    // Starfield Creation
+    function createStars() {
       const layers = [
         document.getElementById('star-layer-1'),
         document.getElementById('star-layer-2'),
@@ -1378,28 +1417,23 @@
         const starCount = Math.floor(baseDensity * layerMultiplier);
         const sizeMultiplier = 1 + (index * 0.3);
         
-        const bufferCanvas = document.createElement('canvas');
-        const bufferCtx = bufferCanvas.getContext('2d');
-        bufferCanvas.width = window.innerWidth;
-        bufferCanvas.height = window.innerHeight;
-        
-        bufferCtx.fillStyle = 'white';
         for (let i = 0; i < starCount; i++) {
-          const x = Math.random() * bufferCanvas.width;
-          const y = Math.random() * bufferCanvas.height;
-          const size = (Math.random() * 2 + 0.5) * sizeMultiplier;
+          const star = document.createElement('div');
+          star.classList.add('star');
           
-          bufferCtx.beginPath();
-          bufferCtx.arc(x, y, size, 0, Math.PI * 2);
-          bufferCtx.fill();
+          const size = (Math.random() * 2 + 0.5) * sizeMultiplier;
+          star.style.width = `${size}px`;
+          star.style.height = `${size}px`;
+          
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 100}%`;
+          
+          layer.appendChild(star);
         }
-        
-        layer.style.backgroundImage = `url(${bufferCanvas.toDataURL()})`;
-        layer.style.animation = `fall ${100 / Math.max(0.5, currentSettings.animationSpeed)}s linear infinite`;
       });
     }
     
-    // Optimized Shooting Stars
+    // Shooting stars
     function createShootingStars() {
       const container = document.getElementById('shooting-stars');
       container.innerHTML = '';
@@ -1518,7 +1552,7 @@
         currentSettings.starDensity = parseInt(this.value);
         document.getElementById('starDensityValue').textContent = this.value;
         updateCSSVariables();
-        createOptimizedStars();
+        createStars();
       });
       
       document.getElementById('shootingStarFreq').addEventListener('input', function() {
@@ -1629,7 +1663,7 @@
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        createOptimizedStars();
+        createStars();
       }, 200);
     });
     
